@@ -266,6 +266,29 @@ random id saved in Lampa otherwise. To let only some devices answer, set a list 
 window.tvctl_devices = ['MIBOX4', 'TIZEN'];
 ```
 
+### Optional MCP remote
+
+`EX.TvCtl` can expose one paired Lampa screen to MCP clients over Streamable HTTP.
+Set `TVCTL_MCP_DEVICE_TOKEN` for the screen and `TVCTL_MCP_TOKENS` to a
+comma-separated list of client tokens. Use a different random token of at least
+32 characters for each client and for the screen. Serve Lampac and Lampa from
+the same HTTPS origin (localhost also works for testing).
+
+Copy `plugin/tvctl-mcp.js` to the same Lampac web root as the other plugins.
+Set `tvctl_mcp_device_token` in that screen's Lampa origin local storage, add
+the script in **Settings → Extensions**, then reload Lampa. Use the MCP receiver
+on one browser profile per instance. The existing CLI and TV plugin work
+independently.
+
+Connect an MCP client to `/tvctl/mcp` with its bearer token. Call
+`lampa_present` with a title and kind (`movie` or `series`), plus a year,
+season, episode or Online provider as needed. Poll `lampa_status` with the
+returned operation ID. Once the screen reports `shown`, pass its selection ID
+to `lampa_play` when the viewer asks to start. Changing the card invalidates
+the selection. Playback uses providers that expose a playable HTTP stream via
+Lampac Online; the receiver reports an unavailable episode or stream explicitly.
+
+
 ### Commands
 
 | Command | Parameters | Effect |
